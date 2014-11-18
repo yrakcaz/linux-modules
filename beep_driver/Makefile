@@ -12,7 +12,7 @@ else
 all:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
 
-load: all
+load:
 	sudo /sbin/insmod $(NAME).ko
 
 unload:
