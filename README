@@ -1,0 +1,16 @@
+README
+======
+
+Just some works about linux kernel modules and drivers.
+
+make:
+    build all modules
+
+make load:
+    load all modules to the kernel
+
+make unload:
+    unload all modules from the kernel
+
+make clean:
+    clean the built modules
