@@ -22,13 +22,14 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("Zackary Ayoun <zackaryayoun@gmail.com>");
 MODULE_DESCRIPTION("Little pc speaker beep driver.");
+MODULE_ALIAS("platform:beep");
 
 /* Module function declarations */
-int __init beep_init(void);
-void __init beep_exit(void);
+int beep_init(void);
+void beep_exit(void);
 int beep_suspend(struct device *dev);
-int __devinit beep_probe(struct platform_device *dev);
-int __devexit beep_remove(struct platform_device *dev);
+int beep_probe(struct platform_device *dev);
+int beep_remove(struct platform_device *dev);
 void beep_shutdown(struct platform_device *dev);
 
 /* Structures which declare driver operations */
