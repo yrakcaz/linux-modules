@@ -21,4 +21,6 @@ unload:
 clean:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) clean
 
+distclean: clean unload
+
 endif
