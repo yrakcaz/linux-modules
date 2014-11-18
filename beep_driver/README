@@ -1,0 +1,8 @@
+README
+======
+
+I just do this beep driver to learn device driver development.
+
+If you want to use it :
+
+--> make load
