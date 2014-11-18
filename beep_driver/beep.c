@@ -2,7 +2,14 @@
 
 int beep_init(void)
 {
-    int ret = platform_driver_register(&beep_funcs);
+    int ret;
+    ret = platform_device_register(&beep_dev);
+    if (ret)
+    {
+        printk(KERN_ALERT "beep: error while registering platform device.\n");
+        return ret;
+    }
+    ret = platform_driver_register(&beep_funcs);
     if (ret)
         printk(KERN_ALERT "beep: error while registering platform driver.\n");
     else
@@ -12,6 +19,7 @@ int beep_init(void)
 
 void beep_exit(void)
 {
+    platform_device_unregister(&beep_dev);
     platform_driver_unregister(&beep_funcs);
     printk(KERN_INFO "beep: driver removed!\n");
 }
@@ -40,19 +48,33 @@ static void shutup_beep(void)
 static int treat_beep(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
     unsigned long flags;
-	raw_spin_lock_irqsave(&i8253_lock, flags);
-    if (type)
-        make_beep(BEEP_FREQUE);
+    unsigned int count = 0;
+    if (type != EV_SND)
+    {
+        printk(KERN_ALERT "beep: wrong beep type!\n");
+        return -1;
+    }
+    if (code == SND_BELL && value)
+        value = BEEP_FREQUE;
+    if (value > MIN_RATE && value < MAX_RATE)
+        count = PIT_TICK_RATE / value;
+
+    raw_spin_lock_irqsave(&i8253_lock, flags);
+
+    if (count)
+        make_beep(count);
     else
         shutup_beep();
-	raw_spin_lock_irqsave(&i8253_lock, flags);
+
+    raw_spin_unlock_irqrestore(&i8253_lock, flags);
+
     return 0;
 }
 
 int beep_suspend(struct device *dev)
 {
     printk(KERN_INFO "beep: suspend!\n");
-    return treat_beep(NULL, 1, 0, 0);
+    return treat_beep(NULL, EV_SND, SND_BELL, 0);
 }
 
 int beep_probe(struct platform_device *dev)
@@ -66,9 +88,12 @@ int beep_probe(struct platform_device *dev)
         return -ENOMEM;
     }
 
-    beep_dev->name = "beep beep";
+    beep_dev->name = "PC Speaker";
     beep_dev->phys = "isa0061/input0";
     beep_dev->id.bustype = BUS_ISA;
+    beep_dev->id.vendor = 0x001F;
+    beep_dev->id.product = 0x0001;
+    beep_dev->id.version = 0x0100;
     beep_dev->dev.parent = &dev->dev;
     beep_dev->evbit[0] = BIT_MASK(EV_SND);
     beep_dev->sndbit[0] = BIT_MASK(SND_BELL) | BIT_MASK(SND_TONE);
@@ -92,15 +117,14 @@ int beep_remove(struct platform_device *dev)
 {
     struct input_dev *beep_dev = platform_get_drvdata(dev);
     input_unregister_device(beep_dev);
-    input_set_drvdata(NULL, dev);
+    platform_set_drvdata(dev, NULL);
 
     printk(KERN_INFO "beep: remove!\n");
-    return treat_beep(NULL, 0, 0, 0);
+    return treat_beep(NULL, EV_SND, SND_BELL, 0);
 }
 
 void beep_shutdown(struct platform_device *dev)
 {
     printk(KERN_INFO "beep: shutdown!\n");
-    treat_beep(NULL, 0, 0, 0);
+    treat_beep(NULL, EV_SND, SND_BELL, 0);
 }
-

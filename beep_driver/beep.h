@@ -17,6 +17,8 @@
 # define PIT_SETTING 0xB6
 # define PIT_FREQUEN 1193180
 # define BEEP_FREQUE 1000
+# define MIN_RATE 20
+# define MAX_RATE 32767
 
 /* Module informations */
 MODULE_LICENSE("Dual BSD/GPL");
@@ -32,6 +34,11 @@ int beep_probe(struct platform_device *dev);
 int beep_remove(struct platform_device *dev);
 void beep_shutdown(struct platform_device *dev);
 
+struct platform_device beep_dev =
+{
+    .name = "beep",
+};
+
 /* Structures which declare driver operations */
 struct dev_pm_ops beep_ops =
 {
@@ -40,15 +47,15 @@ struct dev_pm_ops beep_ops =
 
 struct platform_driver beep_funcs =
 {
-    .probe = beep_probe,
-    .remove = beep_remove,
-    .shutdown = beep_shutdown,
     .driver =
     {
         .name = "beep",
         .owner = THIS_MODULE,
         .pm = &beep_ops,
     },
+    .probe = beep_probe,
+    .remove = beep_remove,
+    .shutdown = beep_shutdown,
 };
 
 /* Module init and exit declaration */
