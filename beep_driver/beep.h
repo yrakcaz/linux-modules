@@ -34,6 +34,7 @@ int beep_probe(struct platform_device *dev);
 int beep_remove(struct platform_device *dev);
 void beep_shutdown(struct platform_device *dev);
 
+/* Structur representing the device. */
 struct platform_device beep_dev =
 {
     .name = "beep",
