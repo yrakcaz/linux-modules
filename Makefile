@@ -11,3 +11,5 @@ unload:
 
 clean:
 	$(foreach var, $(DIRS), $(MAKE) -C $(var) clean;)
+
+distclean: clean unload
