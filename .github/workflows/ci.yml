@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get install -y linux-headers-$(uname -r)
+
+      - name: Build
+        run: make
+
+      - name: Load module
+        run: sudo make load
+
+      - name: Verify module is loaded
+        run: lsmod | grep beep
+
+      - name: Unload module
+        run: sudo make unload
