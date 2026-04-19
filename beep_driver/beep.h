@@ -31,7 +31,7 @@ int beep_init(void);
 void beep_exit(void);
 int beep_suspend(struct device *dev);
 int beep_probe(struct platform_device *dev);
-void beep_remove(struct platform_device *dev);
+int beep_remove(struct platform_device *dev);
 void beep_shutdown(struct platform_device *dev);
 
 /* Structure representing the device. */

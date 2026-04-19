@@ -113,7 +113,7 @@ int beep_probe(struct platform_device *dev)
     return 0;
 }
 
-void beep_remove(struct platform_device *dev)
+int beep_remove(struct platform_device *dev)
 {
     struct input_dev *beep_dev = platform_get_drvdata(dev);
     input_unregister_device(beep_dev);
@@ -121,6 +121,7 @@ void beep_remove(struct platform_device *dev)
 
     handle_beep(NULL, EV_SND, SND_BELL, 0);
     pr_info("beep: remove!\n");
+    return 0;
 }
 
 void beep_shutdown(struct platform_device *dev)
